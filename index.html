@@ -15,12 +15,18 @@
     }
     header {
       background: #00AEEF;
-      color: white;
-      padding: 20px;
+      padding: 20px 0;
       text-align: center;
+    }
+    .header-container {
+      background: #fff;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-radius: 10px;
     }
     header img {
       height: 60px;
@@ -30,12 +36,13 @@
       gap: 15px;
     }
     .nav-links a {
-      color: white;
+      color: #000;
       text-decoration: none;
       font-weight: bold;
     }
     .nav-links a.button {
       background: #000;
+      color: #fff;
       padding: 5px 15px;
       border-radius: 5px;
     }
@@ -80,14 +87,16 @@
 </head>
 <body>
   <header>
-    <img src="Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo" />
-    <div class="nav-links">
-      <a href="#">Personal</a>
-      <a href="#">Business</a>
-      <a href="#">Developer</a>
-      <a href="#">Help</a>
-      <a href="#" class="button">Log In</a>
-      <a href="#" class="button">Sign Up</a>
+    <div class="header-container">
+      <img src="Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo" />
+      <div class="nav-links">
+        <a href="#">Personal</a>
+        <a href="#">Business</a>
+        <a href="#">Developer</a>
+        <a href="#">Help</a>
+        <a href="#" class="button">Log In</a>
+        <a href="#" class="button">Sign Up</a>
+      </div>
     </div>
   </header>
 

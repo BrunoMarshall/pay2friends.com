@@ -8,73 +8,97 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      background: #fff;
       color: #333;
       margin: 0;
       padding: 0;
     }
     header {
-      background: #005EA6;
+      background: #00AEEF;
       color: white;
       padding: 20px;
       text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     header img {
       height: 60px;
-      margin-bottom: 10px;
     }
-    .logo {
-      font-size: 2rem;
+    .nav-links {
+      display: flex;
+      gap: 15px;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
       font-weight: bold;
-      letter-spacing: 1px;
+    }
+    .nav-links a.button {
+      background: #000;
+      padding: 5px 15px;
+      border-radius: 5px;
     }
     main {
+      background: #00AEEF;
       padding: 40px 20px;
       text-align: center;
+      color: #000;
     }
     h1 {
-      color: #005EA6;
+      font-size: 2.5rem;
+      margin: 0;
     }
     p {
       font-size: 1.2rem;
       max-width: 600px;
-      margin: auto;
+      margin: 20px auto;
     }
     .button {
       display: inline-block;
       margin-top: 30px;
       padding: 12px 25px;
-      background: #00c897;
+      background: #00C897;
       color: white;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
     }
+    .button::after {
+      content: " 🚀";
+    }
     footer {
       text-align: center;
       padding: 20px;
-      background: #eee;
+      background: #E5E5E5;
       font-size: 0.9rem;
+      position: relative;
+      bottom: 0;
+      width: 100%;
     }
   </style>
 </head>
 <body>
-
   <header>
     <img src="Pay2Friends_Logo.png" alt="Pay2Friends Logo" />
-    <div class="logo">Pay2Friends</div>
-    <div>Micro & Macro Payments. Powered by Shardeum.</div>
+    <div class="nav-links">
+      <a href="#">Personal</a>
+      <a href="#">Business</a>
+      <a href="#">Developer</a>
+      <a href="#">Help</a>
+      <a href="#" class="button">Log In</a>
+      <a href="#" class="button">Sign Up</a>
+    </div>
   </header>
 
   <main>
     <h1>Simple Payments for Everyone</h1>
     <p>Pay2Friends is a decentralized peer-to-peer payment system built on Shardeum. Send, receive, and track crypto payments easily — for games, local trade, social sharing and more.</p>
-    <a href="#" class="button">Coming Soon 🚀</a>
+    <a href="#" class="button">Coming Soon</a>
   </main>
 
   <footer>
-    &copy; 2025 Pay2Friends. Built on Shardeum from the community to the community.
+    © 2025 Pay2Friends. Built on Shardeum from the community to the community.
   </footer>
-
 </body>
 </html>

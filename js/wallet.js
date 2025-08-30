@@ -20,8 +20,8 @@ async function connectWallet() {
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
 
-    document.getElementById("connectBtn").innerText = 
-      userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+    document.getElementById("connectBtn").innerText =
+  userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
 
     document.getElementById("wallet-status").innerText = "✅ Connected to Shardeum Unstablenet";
 

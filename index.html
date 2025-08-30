@@ -14,7 +14,10 @@
       <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="send-tokens.html">Send Tokens</a>
-        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+        <a id="connectBtn" onclick="connectWallet()">Connect Wallet</a>
+        <div id="wallet-status" style="margin-top:5px; font-weight:bold; color:#00C897; font-size:0.9rem;">
+          ❌ Not connected
+        </div>
       </div>
     </div>
   </header>
@@ -23,11 +26,8 @@
     <h1>Simple Crypto Payments for Everyone</h1>
     <p>
       Pay2Friends is a decentralized peer-to-peer payment system built on <b>Shardeum</b>.  
-      Send, receive, and track crypto payments easily for <b>games, local trade, and social sharing</b>.
+      Send, receive, and track crypto payments easily for <b>games, local trade, and social sharing.</b>
     </p>
-    <div id="wallet-status" style="margin-top:20px; font-weight:bold; color:#00C897;">
-      ❌ Not connected
-    </div>
     <a href="send-tokens.html" class="button">Start Sending</a>
   </main>
 
@@ -40,4 +40,3 @@
   <script src="js/wallet.js"></script>
 </body>
 </html>
-

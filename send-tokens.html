@@ -28,6 +28,12 @@
       <button id="connectWallet">Connect Wallet</button>
       <p id="walletAddress">Wallet: Not connected</p>
       <p id="walletBalance">Balance: 0 SHM</p>
+
+      <!-- Email registration -->
+      <div class="email-register">
+        <input type="email" id="emailInput" placeholder="Enter your email to register">
+        <button type="button" id="registerEmailBtn">Register Email</button>
+      </div>
     </div>
 
     <!-- Send Form -->
@@ -50,10 +56,48 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js" defer></script>
-  <script src="js/wallet.js" defer></script>
-  <script defer>
-    const contractABI = [ /* Your ABI here */ ];
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="js/wallet.js"></script>
+  <script>
+    const contractABI = [
+      { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+          { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+          { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "Transfer",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+          { "indexed": true, "internalType": "bytes32", "name": "emailHash", "type": "bytes32" }
+        ],
+        "name": "EmailRegistered",
+        "type": "event"
+      },
+      { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+      { "inputs": [], "name": "deposit", "outputs": [], "stateMutability": "payable", "type": "function" },
+      {
+        "inputs": [
+          { "internalType": "address", "name": "recipient", "type": "address" },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "transfer",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }], "name": "getBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+      { "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "withdraw", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [{ "internalType": "string", "name": "email", "type": "string" }], "name": "registerEmail", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [{ "internalType": "bytes32", "name": "emailHash", "type": "bytes32" }], "name": "getAddressFromEmail", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }
+    ];
+
     const contractAddress = "0xbe9c0bf9a9ef215687b3290c05fd0a69d92bb48e";
 
     let provider, signer, contract;
@@ -65,6 +109,7 @@
       const walletStatusEl = document.getElementById("walletStatus");
       const resultDiv = document.getElementById("result");
       const sendBtn = document.getElementById("sendBtn");
+      const registerBtn = document.getElementById("registerEmailBtn");
 
       if (typeof window.ethereum === "undefined") {
         resultDiv.innerHTML = '<p style="color:red;">Please install MetaMask.</p>';
@@ -101,13 +146,19 @@
 
           if (recipientInput.includes('@')) {
             const emailHash = ethers.utils.id(recipientInput.toLowerCase());
-            tx = await contract.transferByEmail(emailHash, amountWei);
+            const recipientAddress = await contract.getAddressFromEmail(emailHash);
+            if (recipientAddress === ethers.constants.AddressZero) {
+              resultDiv.innerHTML = `<p style="color:red;">Error: Email not registered.</p>`;
+              return;
+            }
+            tx = await contract.transfer(recipientAddress, amountWei);
           } else {
             tx = await contract.transfer(recipientInput, amountWei);
           }
 
-          resultDiv.innerHTML = `<p style="color:green;">Sent ${amount} SHM to ${recipientInput}. Tx Hash: ${tx.hash}</p>`;
+          resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}</p>`;
           await tx.wait();
+          resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} SHM to ${recipientInput}</p>`;
           updateBalance();
         } catch (err) {
           resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
@@ -115,6 +166,23 @@
 
         document.getElementById("recipient").value = '';
         document.getElementById("amount").value = '';
+      });
+
+      // Register Email
+      registerBtn.addEventListener("click", async () => {
+        const email = document.getElementById("emailInput").value.trim();
+        if (!email) {
+          resultDiv.innerHTML = '<p style="color:red;">Enter a valid email.</p>';
+          return;
+        }
+        try {
+          const tx = await contract.registerEmail(email.toLowerCase());
+          resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
+          await tx.wait();
+          resultDiv.innerHTML = `<p style="color:green;">✅ Email registered successfully!</p>`;
+        } catch (err) {
+          resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+        }
       });
 
       async function updateBalance() {

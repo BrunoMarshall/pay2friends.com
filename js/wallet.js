@@ -5,6 +5,10 @@ let signer;
 let userAddress = null;
 
 async function connectWallet() {
+  if (typeof ethers === "undefined") {
+    alert("⚠️ Ethers.js not loaded. Please check script order.");
+    return;
+  }
   if (typeof window.ethereum === 'undefined') {
     alert("MetaMask is not installed. Please install it: https://metamask.io/");
     return;
@@ -21,7 +25,6 @@ async function connectWallet() {
 
     document.getElementById("wallet-status").innerText = "✅ Connected to Shardeum Unstablenet";
 
-    // Check network
     const network = await provider.getNetwork();
     if (network.chainId !== 8080) {
       alert("⚠️ Please switch MetaMask to Shardeum Unstablenet (Chain ID: 8080)");
@@ -39,7 +42,6 @@ async function disconnectWallet() {
   document.getElementById("wallet-status").innerText = "❌ Not connected";
 }
 
-// Auto-refresh on account/network change
 if (typeof window.ethereum !== "undefined") {
   window.ethereum.on("accountsChanged", () => connectWallet());
   window.ethereum.on("chainChanged", () => window.location.reload());

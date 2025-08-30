@@ -1,139 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send SHM Tokens</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send SHM Tokens</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-container">
-            <img src="assets/Pay2Friends_Logo_transparent.png" alt="Logo">
-		<nav class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="send-tokens.html">Send Tokens</a>
-            </nav>
-        </div>
-    </header>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <img src="assets/Pay2Friends_Logo_transparent.png" alt="Logo">
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="send-tokens.html">Send Tokens</a>
+      </nav>
+    </div>
+  </header>
 
-    <!-- Main content -->
-    <main>
-        <h1>Send SHM Tokens</h1>
+  <!-- Main content -->
+  <main>
+    <h1>Send SHM Tokens</h1>
 
-        <!-- Wallet Info Card -->
-        <div class="wallet-info" id="walletCard">
-            <h2>Wallet Information <span id="walletStatus" style="color: red;">● Not connected</span></h2>
-            <button id="connectWallet">Connect Wallet</button>
-            <p id="walletAddress">Wallet: Not connected</p>
-            <p id="walletBalance">Balance: 0 SHM</p>
-        </div>
+    <!-- Wallet Info Card -->
+    <div class="wallet-info" id="walletCard">
+      <h2>Wallet Information <span id="walletStatus" style="color: red;">● Not connected</span></h2>
+      <button id="connectWallet">Connect Wallet</button>
+      <p id="walletAddress">Wallet: Not connected</p>
+      <p id="walletBalance">Balance: 0 SHM</p>
+    </div>
 
-        <!-- Send Form -->
-        <form class="send-form" id="sendForm">
-            <label for="recipient">Recipient (Wallet Address or Email)</label>
-            <input type="text" id="recipient" placeholder="0xABC... or example@email.com">
+    <!-- Send Form -->
+    <form class="send-form" id="sendForm">
+      <label for="recipient">Recipient (Wallet Address or Email)</label>
+      <input type="text" id="recipient" placeholder="0xABC... or example@email.com">
 
-            <label for="amount">Amount</label>
-            <input type="number" id="amount" placeholder="Enter amount in SHM">
+      <label for="amount">Amount</label>
+      <input type="number" id="amount" placeholder="Enter amount in SHM">
 
-            <button type="button" id="sendBtn">Send Tokens</button>
-        </form>
+      <button type="button" id="sendBtn">Send Tokens</button>
+    </form>
 
-        <div id="result"></div>
-    </main>
+    <div id="result"></div>
+  </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>Pay2Friends &copy; 2025</p>
-    </footer>
+  <!-- Footer -->
+  <footer>
+    <p>Pay2Friends &copy; 2025</p>
+  </footer>
 
-    <!-- JS Script -->
-    <script>
-        const contractABI = [ /* Your ABI here */ ];
-        const contractAddress = "0xbe9c0bf9a9ef215687b3290c05fd0a69d92bb48e";
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js" defer></script>
+  <script defer>
+    const contractABI = [ /* Your ABI here */ ];
+    const contractAddress = "0xbe9c0bf9a9ef215687b3290c05fd0a69d92bb48e";
 
-        let provider, signer, contract;
+    let provider, signer, contract;
 
-        async function init() {
-            const connectBtn = document.getElementById("connectWallet");
-            const walletAddressEl = document.getElementById("walletAddress");
-            const walletBalanceEl = document.getElementById("walletBalance");
-            const walletStatusEl = document.getElementById("walletStatus");
-            const resultDiv = document.getElementById("result");
-            const sendBtn = document.getElementById("sendBtn");
+    async function init() {
+      const connectBtn = document.getElementById("connectWallet");
+      const walletAddressEl = document.getElementById("walletAddress");
+      const walletBalanceEl = document.getElementById("walletBalance");
+      const walletStatusEl = document.getElementById("walletStatus");
+      const resultDiv = document.getElementById("result");
+      const sendBtn = document.getElementById("sendBtn");
 
-            if (typeof window.ethereum === "undefined") {
-                resultDiv.innerHTML = '<p style="color:red;">Please install MetaMask.</p>';
-                return;
-            }
+      if (typeof window.ethereum === "undefined") {
+        resultDiv.innerHTML = '<p style="color:red;">Please install MetaMask.</p>';
+        return;
+      }
 
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
-            contract = new ethers.Contract(contractAddress, contractABI, signer);
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-            // Connect Wallet Button
-            connectBtn.addEventListener("click", async () => {
-                await provider.send("eth_requestAccounts", []);
-                const address = await signer.getAddress();
-                walletAddressEl.textContent = `Wallet: ${address}`;
-                walletStatusEl.textContent = '● Connected';
-                walletStatusEl.style.color = 'green';
-                updateBalance();
-            });
+      // Connect Wallet
+      connectBtn.addEventListener("click", async () => {
+        await provider.send("eth_requestAccounts", []);
+        const address = await signer.getAddress();
+        walletAddressEl.textContent = `Wallet: ${address}`;
+        walletStatusEl.textContent = '● Connected';
+        walletStatusEl.style.color = 'green';
+        updateBalance();
+      });
 
-            // Send Token Button
-            sendBtn.addEventListener("click", async () => {
-                const recipientInput = document.getElementById("recipient").value.trim();
-                const amount = document.getElementById("amount").value;
+      // Send Tokens
+      sendBtn.addEventListener("click", async () => {
+        const recipientInput = document.getElementById("recipient").value.trim();
+        const amount = document.getElementById("amount").value;
 
-                if (!recipientInput || !amount || Number(amount) <= 0) {
-                    resultDiv.innerHTML = '<p style="color:red;">Enter a valid recipient and amount.</p>';
-                    return;
-                }
-
-                try {
-                    const amountWei = ethers.utils.parseEther(amount);
-                    let tx;
-
-                    // Check if input is an email or address
-                    if (recipientInput.includes('@')) {
-                        // Hash the email for on-chain lookup
-                        const emailHash = ethers.utils.id(recipientInput.toLowerCase());
-                        tx = await contract.transferByEmail(emailHash, amountWei);
-                    } else {
-                        tx = await contract.transfer(recipientInput, amountWei);
-                    }
-
-                    resultDiv.innerHTML = `<p style="color:green;">Sent ${amount} SHM to ${recipientInput}. Tx Hash: ${tx.hash}</p>`;
-                    await tx.wait();
-                    updateBalance();
-                } catch (err) {
-                    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-                }
-
-                document.getElementById("recipient").value = '';
-                document.getElementById("amount").value = '';
-            });
-
-            async function updateBalance() {
-                const address = await signer.getAddress();
-                const balanceWei = await contract.getBalance(address);
-                const balanceEth = ethers.utils.formatEther(balanceWei);
-                walletBalanceEl.textContent = `Balance: ${balanceEth} SHM`;
-            }
-
-            // Auto-update balance every 10 seconds
-            setInterval(async () => {
-                try {
-                    if (signer) await updateBalance();
-                } catch {}
-            }, 10000);
+        if (!recipientInput || !amount || Number(amount) <= 0) {
+          resultDiv.innerHTML = '<p style="color:red;">Enter a valid recipient and amount.</p>';
+          return;
         }
 
-        window.addEventListener("load", init);
-    </script>
+        try {
+          const amountWei = ethers.utils.parseEther(amount);
+          let tx;
+
+          if (recipientInput.includes('@')) {
+            const emailHash = ethers.utils.id(recipientInput.toLowerCase());
+            tx = await contract.transferByEmail(emailHash, amountWei);
+          } else {
+            tx = await contract.transfer(recipientInput, amountWei);
+          }
+
+          resultDiv.innerHTML = `<p style="color:green;">Sent ${amount} SHM to ${recipientInput}. Tx Hash: ${tx.hash}</p>`;
+          await tx.wait();
+          updateBalance();
+        } catch (err) {
+          resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+        }
+
+        document.getElementById("recipient").value = '';
+        document.getElementById("amount").value = '';
+      });
+
+      async function updateBalance() {
+        const address = await signer.getAddress();
+        const balanceWei = await contract.getBalance(address);
+        const balanceEth = ethers.utils.formatEther(balanceWei);
+        walletBalanceEl.textContent = `Balance: ${balanceEth} SHM`;
+      }
+
+      setInterval(async () => {
+        try {
+          if (signer) await updateBalance();
+        } catch {}
+      }, 10000);
+    }
+
+    window.addEventListener("load", init);
+  </script>
 </body>
 </html>

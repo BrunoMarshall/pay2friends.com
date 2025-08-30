@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pay2Friends | Powered by Shardeum</title>
-  <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_transparent.png" />
+  <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_Fox.png" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -13,8 +13,8 @@
       <img src="assets/Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo" />
       <div class="nav-links">
         <a href="index.html">Home</a>
-        <a href="send-tokens.html" class="button">Send Tokens</a>
-        <button id="connectBtn" class="button" onclick="connectWallet()">Connect Wallet</button>
+        <a href="send-tokens.html">Send Tokens</a>
+        <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
       </div>
     </div>
   </header>
@@ -35,7 +35,8 @@
     © 2025 Pay2Friends. Built on Shardeum from the community to the community.
   </footer>
 
-  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+  <!-- Ethers.js must load BEFORE wallet.js -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <script src="js/wallet.js"></script>
 </body>
 </html>

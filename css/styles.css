@@ -1,4 +1,4 @@
-/* Reset and base styles */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -7,15 +7,16 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f4f9;
+  background: #f4f5f8;
   color: #333;
   line-height: 1.6;
 }
 
+/* Header */
 header {
   background: linear-gradient(90deg, #00AEEF, #00C897);
   padding: 1rem 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header-container {
@@ -33,72 +34,202 @@ header img {
 
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 15px;
 }
 
-.nav-links a {
+.nav-links a, .nav-links button {
   color: #fff;
-  text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s;
+  text-decoration: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
 }
 
-.nav-links a:hover {
-  color: #00C897;
-}
-
-.nav-links .button {
+.nav-links a:hover, .nav-links button:hover {
   background: #fff;
   color: #00AEEF;
-  padding: 8px 15px;
-  border-radius: 5px;
-  transition: background 0.3s;
 }
 
-.nav-links .button:hover {
-  background: #00C897;
-  color: #fff;
-}
-
-main {
-  padding: 50px 20px;
+/* Wallet Info Card */
+.wallet-info {
+  background: #fff;
+  padding: 25px 20px;
+  border-radius: 16px;
+  max-width: 650px;
+  margin: 30px auto;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
   text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.wallet-info.connected {
+  border-left: 6px solid #00C897;
+}
+
+.wallet-info h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.wallet-info .status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f00;
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+
+.wallet-info.connected .status-indicator {
+  background: #00C897;
+}
+
+.wallet-info p {
+  margin: 8px 0;
+  font-size: 1.1rem;
+}
+
+/* Email Registration */
+.email-register {
+  margin-top: 15px;
+}
+
+.email-register input {
+  width: calc(100% - 120px);
+  padding: 10px;
+  margin-right: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.email-register button {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(90deg, #00AEEF, #00C897);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.email-register button:hover {
+  transform: translateY(-2px);
+}
+
+/* Main section */
+main {
+  padding: 40px 20px;
+  max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 h1 {
-  font-size: 2.8rem;
+  font-size: 2.5rem;
   color: #00AEEF;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-p {
-  font-size: 1.1rem;
-  color: #666;
-  max-width: 700px;
-  margin: 0 auto 2rem;
+/* Form */
+.send-form {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  margin-top: 20px;
+  text-align: left;
 }
 
-.button {
-  display: inline-block;
-  padding: 12px 25px;
-  background: #00C897;
-  color: #fff;
-  text-decoration: none;
+.send-form label {
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.send-form input {
+  width: 100%;
+  padding: 12px;
   border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.send-form input:focus {
+  outline: none;
+  border-color: #00AEEF;
+  box-shadow: 0 0 5px rgba(0,174,239,0.5);
+}
+
+.send-form button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  font-size: 1.1rem;
   font-weight: 600;
-  transition: transform 0.3s;
+  color: #fff;
+  background: linear-gradient(90deg, #00AEEF, #00C897);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.button:hover {
-  transform: scale(1.05);
+.send-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
+/* Result messages */
+#result {
+  margin-top: 20px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Footer */
 footer {
   background: #333;
   color: #fff;
   text-align: center;
   padding: 1rem;
-  position: relative;
-  bottom: 0;
-  width: 100%;
+  margin-top: 40px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .send-form {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .email-register input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .email-register button {
+    width: 100%;
+  }
 }

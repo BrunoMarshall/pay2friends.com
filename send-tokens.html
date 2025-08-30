@@ -1,51 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pay2Friends - Send Tokens</title>
-  <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_transparent.png" />
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body>
-  <header>
-    <div class="header-container">
-      <img src="assets/Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo" />
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="#">Personal</a>
-        <a href="#">Business</a>
-        <a href="#">Developer</a>
-        <a href="#">Help</a>
-        <a href="#" class="button">Log In</a>
-        <a href="#" class="button">Sign Up</a>
-      </div>
-    </div>
-  </header>
+<main>
+  <h1>Send Tokens to Friends</h1>
 
-  <main>
-    <h1>Send Tokens to Friends</h1>
-    <div class="send-form">
-      <label for="token-type">Select Token:</label>
-      <select id="token-type">
-        <option value="SHM">SHM (Shardeum)</option>
-        <option value="USTShardeum">USTShardeum</option>
-        <option value="EUROShardeum">EUROShardeum</option>
-      </select>
-      <label for="recipient">Recipient Address:</label>
-      <input type="text" id="recipient" placeholder="Enter recipient address (e.g., 0x...)" />
-      <label for="amount">Amount:</label>
-      <input type="number" id="amount" placeholder="Enter amount" step="0.01" />
-      <button id="sendBtn">Send</button>
-      <div id="result"></div>
-    </div>
-  </main>
+  <div class="send-form">
+    <label for="recipient">Recipient Address:</label>
+    <input type="text" id="recipient" placeholder="Enter recipient address (0x...)" />
 
-  <footer>
-    © 2025 Pay2Friends. Built on Shardeum from the community to the community.
-  </footer>
+    <label for="amount">Amount (SHM):</label>
+    <input type="number" id="amount" step="0.01" />
 
-  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
-  <script src="js/send.js"></script>
-</body>
-</html>
+    <button id="sendBtn" onclick="sendToken()">Send</button>
+    <div id="result"></div>
+  </div>
+</main>

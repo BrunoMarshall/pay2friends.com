@@ -1,160 +1,47 @@
-const { ethers } = require('ethers');
+// send.js - Direct SHM transfers using Pay2Friends contract
+
 const contractABI = [
   {
-    "inputs": [],
-    "name": "deposit",
+    "inputs": [{ "internalType": "address", "name": "recipient", "type": "address" }],
+    "name": "transfer",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transfer",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "balances",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "getBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   }
-]; // ABI from Remix
-const contractAddress = 0x8b28d7d5ce9ba60e884848f0054133f3736da4e3; // Contract address deployed in Remix
+];
 
-async function init() {
-    if (typeof window.ethereum !== 'undefined') {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+const contractAddress = "0xf5fb927a7f7d2679d61f0c316b632587e194b37e";
 
-        const sendBtn = document.getElementById('sendBtn');
-        const resultDiv = document.getElementById('result');
+async function sendToken() {
+  const resultDiv = document.getElementById("result");
 
-        sendBtn.addEventListener('click', async () => {
-            const tokenType = document.getElementById('token-type').value;
-            const recipient = document.getElementById('recipient').value;
-            const amount = ethers.utils.parseEther(document.getElementById('amount').value || '0');
+  if (!signer) {
+    resultDiv.innerHTML = "<p style='color:red;'>⚠️ Connect wallet first.</p>";
+    return;
+  }
 
-            if (!recipient || amount.isZero()) {
-                resultDiv.innerHTML = '<p style="color: red;">Please enter a valid recipient address and amount.</p>';
-                return;
-            }
+  const recipient = document.getElementById("recipient").value.trim();
+  const amount = document.getElementById("amount").value.trim();
 
-            try {
-                const tx = await contract.transfer(recipient, amount);
-                await tx.wait();
-                resultDiv.innerHTML = `<p style="color: green;">Sent ${ethers.utils.formatEther(amount)} ${tokenType} to ${recipient}. Tx: ${tx.hash}</p>`;
-            } catch (error) {
-                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-            }
+  if (!recipient || amount <= 0) {
+    resultDiv.innerHTML = "<p style='color:red;'>❌ Invalid recipient or amount.</p>";
+    return;
+  }
 
-            document.getElementById('recipient').value = '';
-            document.getElementById('amount').value = '';
-        });
-    } else {
-        document.getElementById('result').innerHTML = '<p style="color: red;">Please install MetaMask.</p>';
-    }
+  try {
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+    const tx = await contract.transfer(recipient, {
+      value: ethers.utils.parseEther(amount) // sending SHM directly
+    });
+
+    resultDiv.innerHTML = `<p style='color:blue;'>⏳ Transaction sent: ${tx.hash}</p>`;
+
+    await tx.wait();
+    resultDiv.innerHTML = `<p style='color:green;'>✅ Sent ${amount} SHM to ${recipient}</p>`;
+  } catch (error) {
+    console.error(error);
+    resultDiv.innerHTML = `<p style='color:red;'>⚠️ Error: ${error.message}</p>`;
+  }
 }
 
-window.addEventListener('load', init);

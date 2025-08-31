@@ -33,19 +33,30 @@
         <input type="email" id="emailInput" placeholder="Enter your email to register">
         <button type="button" id="registerEmailBtn">Sign Up</button>
       </div>
+      <div class="email-verify" id="emailVerify" style="display: none;">
+        <input type="email" id="verifyEmailInput" placeholder="Enter your registered email to display">
+        <button type="button" id="verifyEmailBtn">Verify Email</button>
+      </div>
     </div>
 
     <form class="send-form" id="sendForm">
       <label for="recipient">Recipient (Wallet Address or Email)</label>
       <input type="text" id="recipient" placeholder="0xABC... or example@email.com">
-      <label for="tokenSelect">Token</label>
-      <select id="tokenSelect">
-        <option value="0x0">SHM</option>
-        <option value="0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff">P2F</option>
-      </select>
-      <label for="amount">Amount</label>
-      <input type="number" id="amount" placeholder="Enter amount">
+      <div class="token-amount">
+        <div class="form-group">
+          <label for="tokenSelect">Token</label>
+          <select id="tokenSelect">
+            <option value="0x0">SHM</option>
+            <option value="0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff">P2F</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" placeholder="Enter amount">
+        </div>
+      </div>
       <p id="priceConversion">1 SHM = $0.00 USD</p>
+      <p id="amountUSD">Amount: 0 SHM = $0.00 USD</p>
       <button type="button" id="sendBtn">Send Tokens</button>
     </form>
     <div id="result"></div>

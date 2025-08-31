@@ -139,9 +139,12 @@ async function disconnectWallet() {
   signer = null;
   updateWalletUI();
   const emailRegisterDiv = document.getElementById("emailRegister");
-  if (emailRegisterDiv) emailRegisterDiv.style.display = "block";
+  const emailVerifyDiv = document.getElementById("emailVerify");
   const registeredEmailEl = document.getElementById("registeredEmail");
+  if (emailRegisterDiv) emailRegisterDiv.style.display = "block";
+  if (emailVerifyDiv) emailVerifyDiv.style.display = "none";
   if (registeredEmailEl) registeredEmailEl.textContent = "Registered Email: None";
+  localStorage.removeItem("verifiedEmail");
 }
 
 function updateWalletUI() {
@@ -149,6 +152,7 @@ function updateWalletUI() {
   const walletStatus = document.getElementById("wallet-status");
   const walletStatusSend = document.getElementById("walletStatus");
   const walletAddressEl = document.getElementById("walletAddress");
+  const connectWalletBtn = document.getElementById("connectWallet");
 
   if (userAddress) {
     if (connectBtn) connectBtn.innerText = `Log Out (${userAddress.slice(0, 6)}...${userAddress.slice(-4)})`;
@@ -156,34 +160,70 @@ function updateWalletUI() {
     if (walletStatusSend) walletStatusSend.innerText = "● Connected";
     if (walletStatusSend) walletStatusSend.style.color = "green";
     if (walletAddressEl) walletAddressEl.innerText = `Wallet: ${userAddress}`;
+    if (connectWalletBtn) connectWalletBtn.style.display = "none";
   } else {
     if (connectBtn) connectBtn.innerText = "Log In";
     if (walletStatus) walletStatus.innerText = "❌ Not connected";
     if (walletStatusSend) walletStatusSend.innerText = "● Not connected";
     if (walletStatusSend) walletStatusSend.style.color = "red";
     if (walletAddressEl) walletAddressEl.innerText = "Wallet: Not connected";
+    if (connectWalletBtn) connectWalletBtn.style.display = "block";
   }
 }
 
 async function checkEmailRegistration() {
   if (!userAddress || !signer) return;
   const emailRegisterDiv = document.getElementById("emailRegister");
+  const emailVerifyDiv = document.getElementById("emailVerify");
   const registeredEmailEl = document.getElementById("registeredEmail");
-  if (!emailRegisterDiv || !registeredEmailEl) return;
+  if (!emailRegisterDiv || !emailVerifyDiv || !registeredEmailEl) return;
 
   try {
     const contract = new ethers.Contract(contractAddress, contractABI, provider);
     const emailHash = await contract.getEmailFromAddress(userAddress);
+    const storedEmail = localStorage.getItem("verifiedEmail");
     if (emailHash !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
       emailRegisterDiv.style.display = "none";
-      registeredEmailEl.textContent = `Registered Email: ${emailHash} (Hash)`;
+      if (storedEmail) {
+        registeredEmailEl.textContent = `Registered Email: ${storedEmail}`;
+        emailVerifyDiv.style.display = "none";
+      } else {
+        emailVerifyDiv.style.display = "flex";
+        registeredEmailEl.textContent = "Registered Email: Please verify";
+      }
     } else {
       emailRegisterDiv.style.display = "flex";
+      emailVerifyDiv.style.display = "none";
       registeredEmailEl.textContent = "Registered Email: None";
     }
   } catch (err) {
     console.error("Failed to check email registration:", err);
     registeredEmailEl.textContent = "Registered Email: Error checking";
+  }
+}
+
+async function verifyEmail() {
+  const emailInput = document.getElementById("verifyEmailInput").value.trim().toLowerCase();
+  const registeredEmailEl = document.getElementById("registeredEmail");
+  const emailVerifyDiv = document.getElementById("emailVerify");
+  if (!emailInput || !emailInput.includes('@')) {
+    registeredEmailEl.textContent = "Registered Email: Invalid email";
+    return;
+  }
+  try {
+    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+    const emailHash = await contract.getEmailFromAddress(userAddress);
+    const inputHash = ethers.utils.id(emailInput);
+    if (emailHash === inputHash) {
+      localStorage.setItem("verifiedEmail", emailInput);
+      registeredEmailEl.textContent = `Registered Email: ${emailInput}`;
+      emailVerifyDiv.style.display = "none";
+    } else {
+      registeredEmailEl.textContent = "Registered Email: Email does not match";
+    }
+  } catch (err) {
+    console.error("Email verification error:", err);
+    registeredEmailEl.textContent = "Registered Email: Error verifying";
   }
 }
 
@@ -243,8 +283,14 @@ async function fetchSHMPrice() {
 
 function updatePriceConversion() {
   const priceConversionEl = document.getElementById("priceConversion");
+  const amountUSD = document.getElementById("amountUSD");
+  const amountInput = document.getElementById("amount");
   if (priceConversionEl) {
     priceConversionEl.textContent = `1 SHM = $${shmPriceUSD.toFixed(2)} USD`;
+  }
+  if (amountUSD && amountInput) {
+    const amount = parseFloat(amountInput.value) || 0;
+    amountUSD.textContent = `Amount: ${amount} SHM = $${(amount * shmPriceUSD).toFixed(2)} USD`;
   }
 }
 
@@ -343,6 +389,7 @@ async function registerEmail() {
     resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
     await tx.wait();
     resultDiv.innerHTML = `<p style="color:green;">✅ Email registered successfully!</p>`;
+    localStorage.setItem("verifiedEmail", email);
     await checkEmailRegistration();
   } catch (err) {
     console.error("Register email error:", err);
@@ -378,7 +425,9 @@ window.addEventListener("load", () => {
   const connectBtn = document.getElementById("connectBtn");
   const connectWalletBtn = document.getElementById("connectWallet");
   const registerEmailBtn = document.getElementById("registerEmailBtn");
+  const verifyEmailBtn = document.getElementById("verifyEmailBtn");
   const sendBtn = document.getElementById("sendBtn");
+  const amountInput = document.getElementById("amount");
 
   if (connectBtn) {
     connectBtn.addEventListener("click", handleConnectClick);
@@ -389,8 +438,14 @@ window.addEventListener("load", () => {
   if (registerEmailBtn) {
     registerEmailBtn.addEventListener("click", registerEmail);
   }
+  if (verifyEmailBtn) {
+    verifyEmailBtn.addEventListener("click", verifyEmail);
+  }
   if (sendBtn) {
     sendBtn.addEventListener("click", sendTokens);
+  }
+  if (amountInput) {
+    amountInput.addEventListener("input", updatePriceConversion);
   }
 
   updateWalletUI();

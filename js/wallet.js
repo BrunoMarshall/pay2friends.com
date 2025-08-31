@@ -347,20 +347,23 @@ async function sendTokens() {
         to: recipientAddress,
         value: ethers.utils.parseEther(amount)
       });
+      resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}</p>`;
+      await tx.wait();
+      resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} SHM to ${recipientInput}</p>`;
     } else {
       // P2F transfer (ERC-20)
       const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
       const amountWei = ethers.utils.parseUnits(amount, 18);
       tx = await tokenContract.transfer(recipientAddress, amountWei);
+      // Log transfer in Pay2Friends contract
+      const logTx = await contract.logTransfer(recipientAddress, token, amountWei);
+      resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}, Logging: ${logTx.hash}</p>`;
+      await tx.wait();
+      await logTx.wait();
+      resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} P2F to ${recipientInput}</p>`;
     }
 
-    // Log transfer in Pay2Friends contract
-    const logTx = await contract.logTransfer(recipientAddress, token, ethers.utils.parseUnits(amount, token === "0x0" ? 18 : 18));
-    resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}, Logging: ${logTx.hash}</p>`;
-    await tx.wait();
-    await logTx.wait();
-    resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} ${token === "0x0" ? "SHM" : "P2F"} to ${recipientInput}</p>`;
-    await updateBalance();
+    await updateBalance(); // Force balance update
   } catch (err) {
     console.error("Send tokens error:", err);
     resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
@@ -368,6 +371,7 @@ async function sendTokens() {
 
   document.getElementById("recipient").value = '';
   document.getElementById("amount").value = '';
+  updatePriceConversion(); // Reset USD calculation
 }
 
 async function registerEmail() {

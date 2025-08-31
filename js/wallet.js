@@ -242,6 +242,8 @@ async function connectWallet() {
 
 async function disconnectWallet() {
   userAddress = null;
+  provider = null;
+  signer = null;
   updateWalletUI();
 }
 
@@ -252,16 +254,14 @@ function updateWalletUI() {
   const walletAddressEl = document.getElementById("walletAddress");
 
   if (userAddress) {
-    if (connectBtn) connectBtn.innerText = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+    if (connectBtn) connectBtn.innerText = `Log Out (${userAddress.slice(0, 6)}...${userAddress.slice(-4)})`;
     if (walletStatus) walletStatus.innerText = "✅ Connected to Shardeum Unstablenet";
-    if (walletStatus) walletStatus.style.color = "#00C897";
     if (walletStatusSend) walletStatusSend.innerText = "● Connected";
     if (walletStatusSend) walletStatusSend.style.color = "green";
     if (walletAddressEl) walletAddressEl.innerText = `Wallet: ${userAddress}`;
   } else {
     if (connectBtn) connectBtn.innerText = "Log In";
     if (walletStatus) walletStatus.innerText = "❌ Not connected";
-    if (walletStatus) walletStatus.style.color = "#f00";
     if (walletStatusSend) walletStatusSend.innerText = "● Not connected";
     if (walletStatusSend) walletStatusSend.style.color = "red";
     if (walletAddressEl) walletAddressEl.innerText = "Wallet: Not connected";
@@ -348,7 +348,7 @@ async function sendTokens() {
     document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
     return;
   }
-  const recipientInput = document.getElementById("recipient").value.trim();
+  const recipientInput = document.getElementById("recipient").value.trim().toLowerCase();
   const token = document.getElementById("tokenSelect").value;
   const amount = document.getElementById("amount").value;
   const resultDiv = document.getElementById("result");
@@ -364,14 +364,21 @@ async function sendTokens() {
     let tx;
 
     if (recipientInput.includes('@')) {
-      const emailHash = ethers.utils.id(recipientInput.toLowerCase());
+      const emailHash = ethers.utils.id(recipientInput);
+      console.log("Email:", recipientInput, "Hash:", emailHash); // Debug
       const recipientAddress = await contract.getAddressFromEmail(emailHash);
-      if (recipientAddress === ethers.constants.AddressZero) {
+      console.log("Recipient Address:", recipientAddress); // Debug
+      if (recipientAddress === "0x0000000000000000000000000000000000000000") {
         resultDiv.innerHTML = `<p style="color:red;">Error: Email not registered.</p>`;
         return;
       }
       tx = await contract.transfer(recipientAddress, token, amountWei);
     } else {
+      // Validate wallet address
+      if (!ethers.utils.isAddress(recipientInput)) {
+        resultDiv.innerHTML = `<p style="color:red;">Error: Invalid wallet address.</p>`;
+        return;
+      }
       tx = await contract.transfer(recipientInput, token, amountWei);
     }
 
@@ -380,6 +387,7 @@ async function sendTokens() {
     resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} ${token === "0x0" ? "SHM" : "P2F"} to ${recipientInput}</p>`;
     updateBalance();
   } catch (err) {
+    console.error("Send tokens error:", err);
     resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
   }
 
@@ -392,20 +400,46 @@ async function registerEmail() {
     document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
     return;
   }
-  const email = document.getElementById("emailInput").value.trim();
+  const email = document.getElementById("emailInput").value.trim().toLowerCase();
   const resultDiv = document.getElementById("result");
-  if (!email) {
+  if (!email || !email.includes('@')) {
     resultDiv.innerHTML = '<p style="color:red;">Enter a valid email.</p>';
     return;
   }
   try {
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const tx = await contract.registerEmail(email.toLowerCase());
+    const emailHash = ethers.utils.id(email);
+    console.log("Registering Email:", email, "Hash:", emailHash); // Debug
+    const tx = await contract.registerEmail(email);
     resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
     await tx.wait();
     resultDiv.innerHTML = `<p style="color:green;">✅ Email registered successfully!</p>`;
   } catch (err) {
+    console.error("Register email error:", err);
     resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+  }
+}
+
+// Check for existing MetaMask connection on page load
+async function checkExistingConnection() {
+  if (typeof window.ethereum !== "undefined") {
+    try {
+      const accounts = await window.ethereum.request({ method: "eth_accounts" });
+      if (accounts.length > 0) {
+        await connectWallet();
+      }
+    } catch (err) {
+      console.error("Failed to check existing connection:", err);
+    }
+  }
+}
+
+// Toggle connect/disconnect on click
+async function handleConnectClick() {
+  if (userAddress) {
+    await disconnectWallet();
+  } else {
+    await connectWallet();
   }
 }
 
@@ -419,10 +453,10 @@ window.addEventListener("load", () => {
   const sendBtn = document.getElementById("sendBtn");
 
   if (connectBtn) {
-    connectBtn.addEventListener("click", connectWallet);
+    connectBtn.addEventListener("click", handleConnectClick);
   }
   if (connectWalletBtn) {
-    connectWalletBtn.addEventListener("click", connectWallet);
+    connectWalletBtn.addEventListener("click", handleConnectClick);
   }
   if (registerEmailBtn) {
     registerEmailBtn.addEventListener("click", registerEmail);
@@ -438,10 +472,17 @@ window.addEventListener("load", () => {
   }
 
   updateWalletUI();
+  checkExistingConnection();
   setInterval(updateBalance, 10000);
 });
 
 if (typeof window.ethereum !== "undefined") {
-  window.ethereum.on("accountsChanged", () => connectWallet());
+  window.ethereum.on("accountsChanged", (accounts) => {
+    if (accounts.length === 0) {
+      disconnectWallet();
+    } else {
+      connectWallet();
+    }
+  });
   window.ethereum.on("chainChanged", () => window.location.reload());
 }

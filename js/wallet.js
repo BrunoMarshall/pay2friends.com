@@ -4,7 +4,7 @@ let provider;
 let signer;
 let userAddress = null;
 
-const contractAddress = "0xb5451f3a3d22571ed72702335d2c31ec8c1314f2"; // Pay2Friends contract address
+const contractAddress = "0xb5451f3a3d22571ed72702335d2c31ec8c1314f2"; // New contract address
 const tokenAddress = "0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff"; // P2F token
 const contractABI = [
   {

@@ -1,6 +1,6 @@
 /* styles.css */
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
@@ -11,17 +11,19 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 15px 30px;
   background-color: #007bff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-container img {
-  height: 50px;
+  height: 60px;
+  width: auto;
 }
 
 .nav-links {
   display: flex;
-  gap: 15px;
+  gap: 20px;
   align-items: center;
 }
 
@@ -29,46 +31,67 @@ body {
   color: white;
   text-decoration: none;
   font-size: 16px;
-  font-weight: normal;
-  transition: color 0.3s;
+  font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-  color: #ddd;
+  color: #e0e0e0;
 }
 
 #wallet-status {
   color: white;
   font-size: 16px;
-  font-weight: normal;
+  font-weight: 500;
+}
+
+#walletStatus {
+  font-size: 14px;
+  margin-left: 10px;
 }
 
 main {
   max-width: 800px;
-  margin: 20px auto;
+  margin: 30px auto;
   padding: 20px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
   color: #007bff;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #333;
+  font-size: 22px;
+  margin-bottom: 15px;
 }
 
 .wallet-info {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .email-register {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 input, select, button {
-  padding: 8px;
+  padding: 10px;
   font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
 button {
@@ -77,6 +100,7 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -86,19 +110,21 @@ button:hover {
 .send-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
 }
 
 #result {
   margin-top: 20px;
+  font-size: 14px;
 }
 
 footer {
   text-align: center;
-  padding: 10px;
+  padding: 15px;
   background-color: #007bff;
   color: white;
   position: fixed;
   bottom: 0;
   width: 100%;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }

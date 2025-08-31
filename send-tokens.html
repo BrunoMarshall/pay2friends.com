@@ -28,6 +28,7 @@
       <button id="connectWallet">Log In</button>
       <p id="walletAddress">Wallet: Not connected</p>
       <p id="walletBalance">Balance: 0 SHM / 0 P2F</p>
+      <p id="registeredEmail">Registered Email: None</p>
       <div class="email-register" id="emailRegister">
         <input type="email" id="emailInput" placeholder="Enter your email to register">
         <button type="button" id="registerEmailBtn">Sign Up</button>
@@ -51,8 +52,10 @@
   </main>
 
   <footer>
-    <p>© 2025 Pay2Friends. Built on Shardeum from the community to the community.</p>
-    <p id="visitCounter">Page Visits: 0</p>
+    <div class="footer-container">
+      <span>© 2025 Pay2Friends. Built on Shardeum from the community to the community.</span>
+      <span id="visitCounter">Page Visits: 0</span>
+    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>

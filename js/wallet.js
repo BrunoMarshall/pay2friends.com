@@ -5,7 +5,7 @@ let signer;
 let userAddress = null;
 let shmPriceUSD = 0;
 
-const contractAddress = "0x6cbfaf33505b0d29a03d544f179afb859172daa2"; // contract address Pay2Friends.sol
+const contractAddress = "0x6cbfaf33505b0d29a03d544f179afb859172daa2"; // New contract address
 const tokenAddress = "0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff"; // P2F token
 const contractABI = [
   {
@@ -140,6 +140,8 @@ async function disconnectWallet() {
   updateWalletUI();
   const emailRegisterDiv = document.getElementById("emailRegister");
   if (emailRegisterDiv) emailRegisterDiv.style.display = "block";
+  const registeredEmailEl = document.getElementById("registeredEmail");
+  if (registeredEmailEl) registeredEmailEl.textContent = "Registered Email: None";
 }
 
 function updateWalletUI() {
@@ -166,18 +168,22 @@ function updateWalletUI() {
 async function checkEmailRegistration() {
   if (!userAddress || !signer) return;
   const emailRegisterDiv = document.getElementById("emailRegister");
-  if (!emailRegisterDiv) return;
+  const registeredEmailEl = document.getElementById("registeredEmail");
+  if (!emailRegisterDiv || !registeredEmailEl) return;
 
   try {
     const contract = new ethers.Contract(contractAddress, contractABI, provider);
     const emailHash = await contract.getEmailFromAddress(userAddress);
     if (emailHash !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
       emailRegisterDiv.style.display = "none";
+      registeredEmailEl.textContent = `Registered Email: ${emailHash} (Hash)`;
     } else {
       emailRegisterDiv.style.display = "flex";
+      registeredEmailEl.textContent = "Registered Email: None";
     }
   } catch (err) {
     console.error("Failed to check email registration:", err);
+    registeredEmailEl.textContent = "Registered Email: Error checking";
   }
 }
 

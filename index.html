@@ -14,8 +14,9 @@
       <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="send-tokens.html">Send Tokens</a>
-        <a id="connectBtn" onclick="connectWallet()">Connect Wallet</a>
-        <div id="wallet-status" style="margin-top:5px; font-weight:bold; color:#00C897; font-size:0.9rem;">
+        <a id="connectBtn" onclick="connectWallet()">Log In</a>
+        <a id="signUpBtn" href="send-tokens.html">Sign Up</a>
+        <div id="wallet-status" style="margin-top:5px; font-weight:bold; color:#f00; font-size:0.9rem;">
           ❌ Not connected
         </div>
       </div>
@@ -24,18 +25,20 @@
 
   <main>
     <h1>Simple Crypto Payments for Everyone</h1>
-    <p>
-      Pay2Friends is a decentralized peer-to-peer payment system built on <b>Shardeum</b>.  
-      Send, receive, and track crypto payments easily for <b>games, local trade, and social sharing.</b>
-    </p>
-    <a href="send-tokens.html" class="button">Start Sending</a>
+    <p>Pay2Friends is a decentralized peer-to-peer payment system built on Shardeum.</p>
+    <p>Send, receive, and track crypto payments easily for games, local trade, and social sharing, like Venmo/PayPal but powered by blockchain on steroids.</p>
+    <h2>Get Started</h2>
+    <ol>
+      <li>Connect your MetaMask wallet.</li>
+      <li>Register your email address to your wallet.</li>
+      <li>Send money or payments via email or account address.</li>
+    </ol>
   </main>
 
   <footer>
     © 2025 Pay2Friends. Built on Shardeum from the community to the community.
   </footer>
 
-  <!-- IMPORTANT: load ethers.js first -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="js/wallet.js"></script>
 </body>

@@ -133,6 +133,29 @@ header img {
   transform: translateY(-2px);
 }
 
+/* Token Approval and Deposit */
+.token-approval, .token-deposit {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.token-approval select, .token-deposit select, .send-form select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.token-approval input, .token-deposit input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 150px;
+}
+
 /* Main section */
 main {
   flex: 1;
@@ -146,6 +169,20 @@ h1 {
   font-size: 2.5rem;
   color: #00AEEF;
   margin-bottom: 1.5rem;
+}
+
+main ol {
+  list-style-position: inside;
+  margin-top: 20px;
+  text-align: left;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+main ol li {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
 }
 
 /* Form */
@@ -237,6 +274,14 @@ footer {
   }
 
   .email-register button {
+    width: 100%;
+  }
+
+  .token-approval, .token-deposit {
+    flex-direction: column;
+  }
+
+  .token-approval input, .token-deposit input {
     width: 100%;
   }
 }

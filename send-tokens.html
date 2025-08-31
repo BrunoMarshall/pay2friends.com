@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com;">
   <title>Send Tokens</title>
   <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_Fox.png" />
   <link rel="stylesheet" href="css/styles.css" />
@@ -28,7 +28,7 @@
       <button id="connectWallet">Log In</button>
       <p id="walletAddress">Wallet: Not connected</p>
       <p id="walletBalance">Balance: 0 SHM / 0 P2F</p>
-      <div class="email-register">
+      <div class="email-register" id="emailRegister">
         <input type="email" id="emailInput" placeholder="Enter your email to register">
         <button type="button" id="registerEmailBtn">Sign Up</button>
       </div>
@@ -44,13 +44,15 @@
       </select>
       <label for="amount">Amount</label>
       <input type="number" id="amount" placeholder="Enter amount">
+      <p id="priceConversion">1 SHM = $0.00 USD</p>
       <button type="button" id="sendBtn">Send Tokens</button>
     </form>
     <div id="result"></div>
   </main>
 
   <footer>
-    <p>Pay2Friends &copy; 2025</p>
+    <p>© 2025 Pay2Friends. Built on Shardeum from the community to the community.</p>
+    <p id="visitCounter">Page Visits: 0</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>

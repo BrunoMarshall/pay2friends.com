@@ -1,41 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
-  <title>Pay2Friends | Powered by Shardeum</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com;">
+  <title>Send Tokens</title>
   <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_Fox.png" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <header>
     <div class="header-container">
-      <img src="assets/Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo" />
-      <div class="nav-links">
+      <img src="assets/Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo">
+      <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="send-tokens.html">Send Tokens</a>
         <a id="connectBtn">Log In</a>
-        <a id="signUpBtn" href="send-tokens.html">Sign Up</a>
         <div id="wallet-status">❌ Not connected</div>
-      </div>
+      </nav>
     </div>
   </header>
 
   <main>
-    <h1>Simple Crypto Payments for Everyone</h1>
-    <p>Pay2Friends is a decentralized peer-to-peer payment system built on Shardeum.</p>
-    <p>Send, receive, and track crypto payments easily for games, local trade, and social sharing, like Venmo/PayPal but powered by blockchain on steroids.</p>
-    <h2>Get Started</h2>
-    <ol>
-      <li>Connect your MetaMask wallet.</li>
-      <li>Register your email address to your wallet.</li>
-      <li>Send money or payments via email or account address.</li>
-    </ol>
+    <h1>Send Tokens</h1>
+    <div class="wallet-info" id="walletCard">
+      <h2>Wallet Information <span id="walletStatus">● Not connected</span></h2>
+      <button id="connectWallet">Log In</button>
+      <p id="walletAddress">Wallet: Not connected</p>
+      <p id="walletBalance">Balance: 0 SHM / 0 P2F</p>
+      <div class="email-register" id="emailRegister">
+        <input type="email" id="emailInput" placeholder="Enter your email to register">
+        <button type="button" id="registerEmailBtn">Sign Up</button>
+      </div>
+    </div>
+
+    <form class="send-form" id="sendForm">
+      <label for="recipient">Recipient (Wallet Address or Email)</label>
+      <input type="text" id="recipient" placeholder="0xABC... or example@email.com">
+      <label for="tokenSelect">Token</label>
+      <select id="tokenSelect">
+        <option value="0x0">SHM</option>
+        <option value="0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff">P2F</option>
+      </select>
+      <label for="amount">Amount</label>
+      <input type="number" id="amount" placeholder="Enter amount">
+      <p id="priceConversion">1 SHM = $0.00 USD</p>
+      <button type="button" id="sendBtn">Send Tokens</button>
+    </form>
+    <div id="result"></div>
   </main>
 
   <footer>
-    © 2025 Pay2Friends. Built on Shardeum from the community to the community.
+    <p>© 2025 Pay2Friends. Built on Shardeum from the community to the community.</p>
+    <p id="visitCounter">Page Visits: 0</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>

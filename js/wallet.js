@@ -264,11 +264,17 @@ async function updateBalance() {
   }
 }
 
+// Attach event listener to connect button
+window.addEventListener("load", () => {
+  const connectBtn = document.getElementById("connectBtn");
+  if (connectBtn) {
+    connectBtn.addEventListener("click", connectWallet);
+  }
+  updateWalletUI();
+  setInterval(updateBalance, 10000);
+});
+
 if (typeof window.ethereum !== "undefined") {
   window.ethereum.on("accountsChanged", () => connectWallet());
   window.ethereum.on("chainChanged", () => window.location.reload());
-  window.addEventListener("load", () => {
-    updateWalletUI();
-    setInterval(updateBalance, 10000);
-  });
 }

@@ -4,24 +4,13 @@ let provider;
 let signer;
 let userAddress = null;
 
-const contractAddress = "0x543d71889f984d36fc7d2b1fa019be4c5738ba6b";
-const tokenAddress = "0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff";
+const contractAddress = "0xb5451f3a3d22571ed72702335d2c31ec8c1314f2"; // Pay2Friends contract address
+const tokenAddress = "0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff"; // P2F token
 const contractABI = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "Transfer",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -35,130 +24,19 @@ const contractABI = [
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "bytes32", "name": "oldEmailHash", "type": "bytes32" },
-      { "indexed": true, "internalType": "bytes32", "name": "newEmailHash", "type": "bytes32" }
-    ],
-    "name": "EmailUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
       { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
       { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    "name": "Deposit",
+    "name": "TransferLogged",
     "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "Withdrawal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "token", "type": "address" }
-    ],
-    "name": "TokenAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "token", "type": "address" }
-    ],
-    "name": "TokenRemoved",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" }
-    ],
-    "name": "addToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" }
-    ],
-    "name": "removeToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "depositSHM",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "depositToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "recipient", "type": "address" },
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "transfer",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" },
-      { "internalType": "address", "name": "token", "type": "address" }
-    ],
-    "name": "getBalance",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   {
     "inputs": [
       { "internalType": "string", "name": "email", "type": "string" }
     ],
     "name": "registerEmail",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "string", "name": "oldEmail", "type": "string" },
-      { "internalType": "string", "name": "newEmail", "type": "string" }
-    ],
-    "name": "updateEmail",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -173,18 +51,20 @@ const contractABI = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "logTransfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "supportedTokens",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   }
@@ -193,10 +73,10 @@ const contractABI = [
 const tokenABI = [
   {
     "inputs": [
-      { "internalType": "address", "name": "spender", "type": "address" },
+      { "internalType": "address", "name": "recipient", "type": "address" },
       { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    "name": "approve",
+    "name": "transfer",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -228,12 +108,14 @@ async function connectWallet() {
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
 
-    updateWalletUI();
-    updateBalance();
     const network = await provider.getNetwork();
     if (network.chainId !== 8080) {
       alert("⚠️ Please switch MetaMask to Shardeum Unstablenet (Chain ID: 8080)");
+      return;
     }
+
+    updateWalletUI();
+    await updateBalance();
   } catch (err) {
     console.error("Connection failed:", err);
     alert("Connection failed: " + err.message);
@@ -269,77 +151,42 @@ function updateWalletUI() {
 }
 
 async function updateBalance() {
-  if (!userAddress || !signer) return;
+  if (!userAddress || !signer) {
+    console.log("No user address or signer, skipping balance update");
+    return;
+  }
   const walletBalanceEl = document.getElementById("walletBalance");
-  if (!walletBalanceEl) return;
+  if (!walletBalanceEl) {
+    console.log("No walletBalance element found");
+    return;
+  }
 
   try {
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const shmBalanceWei = await contract.getBalance(userAddress, "0x0");
-    const p2fBalanceWei = await contract.getBalance(userAddress, tokenAddress);
-    const shmBalance = ethers.utils.formatEther(shmBalanceWei);
-    const p2fBalance = ethers.utils.formatUnits(p2fBalanceWei, 18);
-    
+    // Get SHM balance (native token)
+    let shmBalance = "0";
+    try {
+      const shmBalanceWei = await provider.getBalance(userAddress);
+      shmBalance = ethers.utils.formatEther(shmBalanceWei);
+      console.log("SHM balance:", shmBalance);
+    } catch (err) {
+      console.error("Failed to fetch SHM balance:", err);
+    }
+
+    // Get P2F balance (ERC-20)
+    let p2fBalance = "0";
+    try {
+      const tokenContract = new ethers.Contract(tokenAddress, tokenABI, provider);
+      const p2fBalanceWei = await tokenContract.balanceOf(userAddress);
+      p2fBalance = ethers.utils.formatUnits(p2fBalanceWei, 18);
+      console.log("P2F balance:", p2fBalance);
+    } catch (err) {
+      console.error("Failed to fetch P2F balance:", err);
+    }
+
     walletBalanceEl.textContent = `Balance: ${shmBalance} SHM / ${p2fBalance} P2F`;
   } catch (err) {
     console.error("Balance update failed:", err);
-  }
-}
-
-async function approveToken() {
-  if (!provider || !signer) {
-    document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
-    return;
-  }
-  const token = document.getElementById("tokenSelectApproval").value;
-  const amount = document.getElementById("approvalAmount").value;
-  const resultDiv = document.getElementById("result");
-
-  if (token === "0x0" || !amount || Number(amount) <= 0) {
-    resultDiv.innerHTML = '<p style="color:red;">Select a valid token and amount.</p>';
-    return;
-  }
-
-  try {
-    const tokenContract = new ethers.Contract(token, tokenABI, signer);
-    const amountWei = ethers.utils.parseUnits(amount, 18);
-    const tx = await tokenContract.approve(contractAddress, amountWei);
-    resultDiv.innerHTML = `<p style="color:blue;">⏳ Approving tokens... Tx: ${tx.hash}</p>`;
-    await tx.wait();
-    resultDiv.innerHTML = `<p style="color:green;">✅ Tokens approved!</p>`;
-  } catch (err) {
-    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-  }
-}
-
-async function depositTokens() {
-  if (!provider || !signer) {
-    document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
-    return;
-  }
-  const token = document.getElementById("tokenSelectDeposit").value;
-  const amount = document.getElementById("depositAmount").value;
-  const resultDiv = document.getElementById("result");
-
-  if (!amount || Number(amount) <= 0) {
-    resultDiv.innerHTML = '<p style="color:red;">Enter a valid amount.</p>';
-    return;
-  }
-
-  try {
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    let tx;
-    if (token === "0x0") {
-      tx = await contract.depositSHM({ value: ethers.utils.parseEther(amount) });
-    } else {
-      tx = await contract.depositToken(token, ethers.utils.parseUnits(amount, 18));
-    }
-    resultDiv.innerHTML = `<p style="color:blue;">⏳ Depositing tokens... Tx: ${tx.hash}</p>`;
-    await tx.wait();
-    resultDiv.innerHTML = `<p style="color:green;">✅ Deposited ${amount} ${token === "0x0" ? "SHM" : "P2F"}</p>`;
-    updateBalance();
-  } catch (err) {
-    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    walletBalanceEl.textContent = "Balance: Error fetching balances";
   }
 }
 
@@ -359,33 +206,47 @@ async function sendTokens() {
   }
 
   try {
+    let recipientAddress;
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const amountWei = token === "0x0" ? ethers.utils.parseEther(amount) : ethers.utils.parseUnits(amount, 18);
-    let tx;
 
     if (recipientInput.includes('@')) {
       const emailHash = ethers.utils.id(recipientInput);
-      console.log("Email:", recipientInput, "Hash:", emailHash); // Debug
-      const recipientAddress = await contract.getAddressFromEmail(emailHash);
-      console.log("Recipient Address:", recipientAddress); // Debug
+      console.log("Email:", recipientInput, "Hash:", emailHash);
+      recipientAddress = await contract.getAddressFromEmail(emailHash);
+      console.log("Recipient Address:", recipientAddress);
       if (recipientAddress === "0x0000000000000000000000000000000000000000") {
         resultDiv.innerHTML = `<p style="color:red;">Error: Email not registered.</p>`;
         return;
       }
-      tx = await contract.transfer(recipientAddress, token, amountWei);
     } else {
-      // Validate wallet address
       if (!ethers.utils.isAddress(recipientInput)) {
         resultDiv.innerHTML = `<p style="color:red;">Error: Invalid wallet address.</p>`;
         return;
       }
-      tx = await contract.transfer(recipientInput, token, amountWei);
+      recipientAddress = recipientInput;
     }
 
-    resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}</p>`;
+    let tx;
+    if (token === "0x0") {
+      // SHM transfer (native)
+      tx = await signer.sendTransaction({
+        to: recipientAddress,
+        value: ethers.utils.parseEther(amount)
+      });
+    } else {
+      // P2F transfer (ERC-20)
+      const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
+      const amountWei = ethers.utils.parseUnits(amount, 18);
+      tx = await tokenContract.transfer(recipientAddress, amountWei);
+    }
+
+    // Log transfer in Pay2Friends contract
+    const logTx = await contract.logTransfer(recipientAddress, token, ethers.utils.parseUnits(amount, token === "0x0" ? 18 : 18));
+    resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}, Logging: ${logTx.hash}</p>`;
     await tx.wait();
+    await logTx.wait();
     resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} ${token === "0x0" ? "SHM" : "P2F"} to ${recipientInput}</p>`;
-    updateBalance();
+    await updateBalance();
   } catch (err) {
     console.error("Send tokens error:", err);
     resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
@@ -409,7 +270,7 @@ async function registerEmail() {
   try {
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
     const emailHash = ethers.utils.id(email);
-    console.log("Registering Email:", email, "Hash:", emailHash); // Debug
+    console.log("Registering Email:", email, "Hash:", emailHash);
     const tx = await contract.registerEmail(email);
     resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
     await tx.wait();
@@ -448,8 +309,6 @@ window.addEventListener("load", () => {
   const connectBtn = document.getElementById("connectBtn");
   const connectWalletBtn = document.getElementById("connectWallet");
   const registerEmailBtn = document.getElementById("registerEmailBtn");
-  const approveTokenBtn = document.getElementById("approveTokenBtn");
-  const depositTokensBtn = document.getElementById("depositTokensBtn");
   const sendBtn = document.getElementById("sendBtn");
 
   if (connectBtn) {
@@ -460,12 +319,6 @@ window.addEventListener("load", () => {
   }
   if (registerEmailBtn) {
     registerEmailBtn.addEventListener("click", registerEmail);
-  }
-  if (approveTokenBtn) {
-    approveTokenBtn.addEventListener("click", approveToken);
-  }
-  if (depositTokensBtn) {
-    depositTokensBtn.addEventListener("click", depositTokens);
   }
   if (sendBtn) {
     sendBtn.addEventListener("click", sendTokens);

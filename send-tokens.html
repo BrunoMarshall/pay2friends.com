@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
   <title>Send Tokens</title>
   <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_Fox.png" />
   <link rel="stylesheet" href="css/styles.css" />
@@ -14,7 +15,7 @@
       <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="send-tokens.html">Send Tokens</a>
-        <a id="connectBtn" onclick="connectWallet()">Log In</a>
+        <a id="connectBtn">Log In</a>
         <div id="wallet-status" style="margin-top:5px; font-weight:bold; color:#f00; font-size:0.9rem;">
           ❌ Not connected
         </div>
@@ -70,7 +71,7 @@
     <p>Pay2Friends &copy; 2025</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
   <script src="js/wallet.js"></script>
   <script>
     const contractAddress = "0x543d71889f984d36fc7d2b1fa019be4c5738ba6b";
@@ -297,7 +298,7 @@
 
       try {
         const tokenContract = new ethers.Contract(token, tokenABI, signer);
-        const amountWei = ethers.utils.parseUnits(amount, 18);
+        const amountWei = ethers.parseUnits(amount, 18);
         const tx = await tokenContract.approve(contractAddress, amountWei);
         resultDiv.innerHTML = `<p style="color:blue;">⏳ Approving tokens... Tx: ${tx.hash}</p>`;
         await tx.wait();
@@ -325,9 +326,9 @@
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
         let tx;
         if (token === "0x0") {
-          tx = await contract.depositSHM({ value: ethers.utils.parseEther(amount) });
+          tx = await contract.depositSHM({ value: ethers.parseEther(amount) });
         } else {
-          tx = await contract.depositToken(token, ethers.utils.parseUnits(amount, 18));
+          tx = await contract.depositToken(token, ethers.parseUnits(amount, 18));
         }
         resultDiv.innerHTML = `<p style="color:blue;">⏳ Depositing tokens... Tx: ${tx.hash}</p>`;
         await tx.wait();
@@ -349,19 +350,19 @@
       const resultDiv = document.getElementById("result");
 
       if (!recipientInput || !amount || Number(amount) <= 0) {
-        resultDiv.innerHTML = '<p style="color:red;">Enter a valid recipient and amount.</p>';
+        resultDiv.innerHTML = `<p style="color:red;">Enter a valid recipient and amount.</p>';
         return;
       }
 
       try {
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
-        const amountWei = token === "0x0" ? ethers.utils.parseEther(amount) : ethers.utils.parseUnits(amount, 18);
+        const amountWei = token === "0x0" ? ethers.parseEther(amount) : ethers.parseUnits(amount, 18);
         let tx;
 
         if (recipientInput.includes('@')) {
           const emailHash = ethers.utils.id(recipientInput.toLowerCase());
           const recipientAddress = await contract.getAddressFromEmail(emailHash);
-          if (recipientAddress === ethers.constants.AddressZero) {
+          if (recipientAddress === ethers.ZeroAddress) {
             resultDiv.innerHTML = `<p style="color:red;">Error: Email not registered.</p>`;
             return;
           }
@@ -394,15 +395,4 @@
         return;
       }
       try {
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
-        const tx = await contract.registerEmail(email.toLowerCase());
-        resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
-        await tx.wait();
-        resultDiv.innerHTML = `<p style="color:green;">✅ Email registered successfully!</p>`;
-      } catch (err) {
-        resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-      }
-    }
-  </script>
-</body>
-</html>
+        const contract = new ethers.Contract...

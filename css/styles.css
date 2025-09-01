@@ -74,12 +74,19 @@ main {
 
 h1, h2 {
   color: #007bff;
-  font-size: 28px;
   margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 28px;
 }
 
 h2 {
   font-size: 22px;
+}
+
+.title-large {
+  font-size: 56px;
 }
 
 p, ul {

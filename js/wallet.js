@@ -127,6 +127,7 @@ async function connectWallet() {
     updateWalletUI();
     await updateBalance();
     await checkEmailRegistration();
+    await displayFriends(); // Populate friends dropdown on connect
   } catch (err) {
     console.error("Connection failed:", err);
     alert("Connection failed: " + err.message);
@@ -141,10 +142,13 @@ async function disconnectWallet() {
   const emailRegisterDiv = document.getElementById("emailRegister");
   const emailVerifyDiv = document.getElementById("emailVerify");
   const registeredEmailEl = document.getElementById("registeredEmail");
+  const friendsDropdown = document.getElementById("friendsDropdown");
   if (emailRegisterDiv) emailRegisterDiv.style.display = "block";
   if (emailVerifyDiv) emailVerifyDiv.style.display = "none";
   if (registeredEmailEl) registeredEmailEl.textContent = "Registered Email: None";
+  if (friendsDropdown) friendsDropdown.innerHTML = '<option value="">Select a friend</option>';
   localStorage.removeItem("verifiedEmail");
+  await displayFriends(); // Clear friends list on disconnect
 }
 
 function updateWalletUI() {
@@ -304,17 +308,87 @@ function updateVisitCounter() {
   visitCounterEl.textContent = `Page Visits: ${visits}`;
 }
 
+async function saveFriend(emailOrAddress, address) {
+  const friends = JSON.parse(localStorage.getItem("friends") || "[]");
+  const isEmail = emailOrAddress.includes('@');
+  const contract = new ethers.Contract(contractAddress, contractABI, provider);
+  let friendData;
+
+  if (isEmail) {
+    const emailHash = ethers.utils.id(emailOrAddress);
+    const verifiedAddress = await contract.getAddressFromEmail(emailHash);
+    if (verifiedAddress === "0x0000000000000000000000000000000000000000") {
+      return false; // Email not registered
+    }
+    friendData = { email: emailOrAddress, address: verifiedAddress };
+  } else {
+    const emailHash = await contract.getEmailFromAddress(emailOrAddress);
+    const storedEmail = localStorage.getItem(`email_${emailOrAddress}`);
+    if (emailHash === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+      return false; // Address not registered
+    }
+    friendData = { email: storedEmail || emailOrAddress, address: emailOrAddress };
+  }
+
+  if (!friends.some(f => f.address === friendData.address)) {
+    friends.push(friendData);
+    localStorage.setItem("friends", JSON.stringify(friends));
+  }
+  return true;
+}
+
+async function displayFriends() {
+  const friendsDropdown = document.getElementById("friendsDropdown");
+  const friendsList = document.getElementById("friendsList");
+  if (!friendsDropdown || !friendsList) return;
+
+  const friends = JSON.parse(localStorage.getItem("friends") || "[]");
+  friendsDropdown.innerHTML = '<option value="">Select a friend</option>';
+  friendsList.innerHTML = "<h3>Friends</h3><ul>";
+
+  for (const friend of friends) {
+    friendsDropdown.innerHTML += `<option value="${friend.email || friend.address}">${friend.email || friend.address}</option>`;
+    friendsList.innerHTML += `<li>${friend.email || friend.address} (${friend.address.slice(0, 6)}...${friend.address.slice(-4)})</li>`;
+  }
+
+  friendsList.innerHTML += "</ul>";
+}
+
+async function addFriend() {
+  const friendInput = document.getElementById("friendInput").value.trim().toLowerCase();
+  const resultDiv = document.getElementById("result");
+  if (!friendInput) {
+    resultDiv.innerHTML = `<p style="color:red;">Enter a valid email or address.</p>`;
+    return;
+  }
+
+  try {
+    const success = await saveFriend(friendInput, friendInput);
+    if (success) {
+      resultDiv.innerHTML = `<p style="color:green;">✅ Friend added successfully!</p>`;
+      await displayFriends();
+    } else {
+      resultDiv.innerHTML = `<p style="color:red;">Error: Email or address not registered.</p>`;
+    }
+  } catch (err) {
+    console.error("Add friend error:", err);
+    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+  }
+}
+
 async function sendTokens() {
   if (!provider || !signer) {
     document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
     return;
   }
   const recipientInput = document.getElementById("recipient").value.trim().toLowerCase();
+  const friendsDropdown = document.getElementById("friendsDropdown").value;
+  const recipient = friendsDropdown || recipientInput;
   const token = document.getElementById("tokenSelect").value;
   const amount = document.getElementById("amount").value;
   const resultDiv = document.getElementById("result");
 
-  if (!recipientInput || !amount || Number(amount) <= 0) {
+  if (!recipient || !amount || Number(amount) <= 0) {
     resultDiv.innerHTML = `<p style="color:red;">Enter a valid recipient and amount.</p>`;
     return;
   }
@@ -323,9 +397,9 @@ async function sendTokens() {
     let recipientAddress;
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-    if (recipientInput.includes('@')) {
-      const emailHash = ethers.utils.id(recipientInput);
-      console.log("Email:", recipientInput, "Hash:", emailHash);
+    if (recipient.includes('@')) {
+      const emailHash = ethers.utils.id(recipient);
+      console.log("Email:", recipient, "Hash:", emailHash);
       recipientAddress = await contract.getAddressFromEmail(emailHash);
       console.log("Recipient Address:", recipientAddress);
       if (recipientAddress === "0x0000000000000000000000000000000000000000") {
@@ -333,11 +407,11 @@ async function sendTokens() {
         return;
       }
     } else {
-      if (!ethers.utils.isAddress(recipientInput)) {
+      if (!ethers.utils.isAddress(recipient)) {
         resultDiv.innerHTML = `<p style="color:red;">Error: Invalid wallet address.</p>`;
         return;
       }
-      recipientAddress = recipientInput;
+      recipientAddress = recipient;
     }
 
     let tx;
@@ -349,7 +423,7 @@ async function sendTokens() {
       });
       resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}</p>`;
       await tx.wait();
-      resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} SHM to ${recipientInput}</p>`;
+      resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} SHM to ${recipient}</p>`;
     } else {
       // P2F transfer (ERC-20)
       const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
@@ -360,10 +434,13 @@ async function sendTokens() {
       resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}, Logging: ${logTx.hash}</p>`;
       await tx.wait();
       await logTx.wait();
-      resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} P2F to ${recipientInput}</p>`;
+      resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} P2F to ${recipient}</p>`;
     }
 
-    await updateBalance(); // Force balance update
+    // Save friend after successful transfer
+    await saveFriend(recipient, recipientAddress);
+    await displayFriends();
+    await updateBalance();
   } catch (err) {
     console.error("Send tokens error:", err);
     resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
@@ -371,7 +448,7 @@ async function sendTokens() {
 
   document.getElementById("recipient").value = '';
   document.getElementById("amount").value = '';
-  updatePriceConversion(); // Reset USD calculation
+  updatePriceConversion();
 }
 
 async function registerEmail() {
@@ -431,7 +508,9 @@ window.addEventListener("load", () => {
   const registerEmailBtn = document.getElementById("registerEmailBtn");
   const verifyEmailBtn = document.getElementById("verifyEmailBtn");
   const sendBtn = document.getElementById("sendBtn");
+  const addFriendBtn = document.getElementById("addFriendBtn");
   const amountInput = document.getElementById("amount");
+  const friendsDropdown = document.getElementById("friendsDropdown");
 
   if (connectBtn) {
     connectBtn.addEventListener("click", handleConnectClick);
@@ -448,8 +527,16 @@ window.addEventListener("load", () => {
   if (sendBtn) {
     sendBtn.addEventListener("click", sendTokens);
   }
+  if (addFriendBtn) {
+    addFriendBtn.addEventListener("click", addFriend);
+  }
   if (amountInput) {
     amountInput.addEventListener("input", updatePriceConversion);
+  }
+  if (friendsDropdown) {
+    friendsDropdown.addEventListener("change", () => {
+      document.getElementById("recipient").value = friendsDropdown.value;
+    });
   }
 
   updateWalletUI();
@@ -458,6 +545,7 @@ window.addEventListener("load", () => {
   fetchSHMPrice();
   setInterval(fetchSHMPrice, 10000);
   setInterval(updateBalance, 10000);
+  displayFriends();
 });
 
 if (typeof window.ethereum !== "undefined") {

@@ -81,7 +81,7 @@ h2 {
   margin-bottom: 30px;
 }
 
-.email-register, .email-verify {
+.email-register, .email-verify, .manage-friends, .recipient-group {
   display: flex;
   gap: 10px;
   margin-top: 15px;
@@ -125,6 +125,15 @@ button:hover {
   gap: 15px;
 }
 
+.recipient-group select {
+  flex: 1;
+  min-width: 150px;
+}
+
+.recipient-group input {
+  flex: 2;
+}
+
 .token-amount {
   display: flex;
   gap: 20px;
@@ -145,6 +154,21 @@ button:hover {
 #result {
   margin-top: 20px;
   font-size: 14px;
+}
+
+#friendsList {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #333;
+}
+
+#friendsList ul {
+  list-style: none;
+  padding: 0;
+}
+
+#friendsList li {
+  padding: 5px 0;
 }
 
 footer {

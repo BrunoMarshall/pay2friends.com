@@ -41,7 +41,12 @@
 
     <form class="send-form" id="sendForm">
       <label for="recipient">Recipient (Wallet Address or Email)</label>
-      <input type="text" id="recipient" placeholder="0xABC... or example@email.com">
+      <div class="recipient-group">
+        <select id="friendsDropdown">
+          <option value="">Select a friend</option>
+        </select>
+        <input type="text" id="recipient" placeholder="0xABC... or example@email.com">
+      </div>
       <div class="token-amount">
         <div class="form-group">
           <label for="tokenSelect">Token</label>
@@ -59,6 +64,14 @@
       <p id="amountUSD">Amount: 0 SHM = $0.00 USD</p>
       <button type="button" id="sendBtn">Send Tokens</button>
     </form>
+    <div class="manage-friends">
+      <h2>Manage Friends</h2>
+      <div id="manageFriends">
+        <input type="text" id="friendInput" placeholder="Enter friend's email or address">
+        <button type="button" id="addFriendBtn">Add Friend</button>
+      </div>
+      <div id="friendsList"></div>
+    </div>
     <div id="result"></div>
   </main>
 

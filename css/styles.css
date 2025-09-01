@@ -65,6 +65,13 @@ main {
   text-align: center;
 }
 
+.about-logo {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 150px;
+  height: auto;
+}
+
 h1 {
   color: #007bff;
   font-size: 28px;
@@ -75,6 +82,29 @@ h2 {
   color: #333;
   font-size: 22px;
   margin-bottom: 15px;
+}
+
+p, ul {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+ul li {
+  margin-bottom: 10px;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 .wallet-info {

@@ -1,30 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com;">
-  <title>Pay2Friends</title>
+  <title>Pay2Friends | Powered by Shardeum</title>
   <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_Fox.png" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <header>
     <div class="header-container">
-      <img src="assets/Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo">
-      <nav class="nav-links">
+      <img src="assets/Pay2Friends_Logo_transparent.png" alt="Pay2Friends Logo" />
+      <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="about.html">About</a>
         <a href="send-tokens.html">Send Tokens</a>
         <a id="connectBtn">Log In</a>
+        <a id="signUpBtn" href="send-tokens.html">Sign Up</a>
         <div id="wallet-status">❌ Not connected</div>
-      </nav>
+      </div>
     </div>
   </header>
 
   <main>
-    <h1>Pay2Friends</h1>
-    <p>Send tokens to your friends using their email or wallet address on the Shardeum blockchain.</p>
+    <h1 class="centered-text">Pay2Friends</h1>
+    <div class="centered-text">
+      <h1>Simple Crypto Payments for Everyone</h1>
+      <p>Pay2Friends is a decentralized peer-to-peer payment system built on Shardeum.</p>
+      <p>Send, receive, and track crypto payments easily for games, local trade, and social sharing, like Venmo/PayPal but powered by blockchain on steroids.</p>
+      <h2>Get Started</h2>
+    </div>
+    <ol>
+      <li>Connect your MetaMask wallet.</li>
+      <li>Register your email address to your wallet.</li>
+      <li>Send money or payments via email or account address.</li>
+    </ol>
   </main>
 
   <footer>

@@ -72,16 +72,14 @@ main {
   height: auto;
 }
 
-h1 {
+h1, h2 {
   color: #007bff;
   font-size: 28px;
   margin-bottom: 20px;
 }
 
 h2 {
-  color: #333;
   font-size: 22px;
-  margin-bottom: 15px;
 }
 
 p, ul {

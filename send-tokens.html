@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com https://*.firebaseio.com https://*.googleapis.com;">
   <title>Send Tokens</title>
   <link rel="icon" type="image/png" href="assets/Pay2Friends_Logo_Fox.png" />
   <link rel="stylesheet" href="css/styles.css" />
@@ -31,7 +31,7 @@
       <p id="registeredEmail">Registered Email: None</p>
       <div class="email-register" id="emailRegister">
         <input type="email" id="emailInput" placeholder="Enter your email to register">
-        <button type="button" id="registerEmailBtn">Sign Up</button>
+        <button type="button" id="sendMagicLinkBtn">Send Magic Link</button>
       </div>
       <div class="email-verify" id="emailVerify" style="display: none;">
         <input type="email" id="verifyEmailInput" placeholder="Enter your registered email to display">
@@ -82,6 +82,8 @@
     </div>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="js/wallet.js"></script>
 </body>

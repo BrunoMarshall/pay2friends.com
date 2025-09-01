@@ -1,26 +1,11 @@
-// wallet.js - MetaMask connection handling with Ethers.js and Firebase Authentication
+// wallet.js - MetaMask connection handling with Ethers.js
 
 let provider;
 let signer;
 let userAddress = null;
 let shmPriceUSD = 0;
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDWf164g_K3CEQ1PFUet2AW45s_IotEGWY",
-  authDomain: "pay2friends.firebaseapp.com",
-  projectId: "pay2friends",
-  storageBucket: "pay2friends.firebasestorage.app",
-  messagingSenderId: "368222853853",
-  appId: "1:368222853853:web:75af77c46068f68fba9934",
-  measurementId: "G-9TSWBZLGSH"
-};
-
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-const contractAddress = "0x6cbfaf33505b0d29a03d544f179afb859172daa2"; // Existing contract address
+const contractAddress = "0x6cbfaf33505b0d29a03d544f179afb859172daa2"; // New contract address
 const tokenAddress = "0x30d16e2bd13bfdf42a47cc18468240bc3bed69ff"; // P2F token
 const contractABI = [
   {
@@ -142,7 +127,7 @@ async function connectWallet() {
     updateWalletUI();
     await updateBalance();
     await checkEmailRegistration();
-    await displayFriends();
+    await displayFriends(); // Populate friends dropdown on connect
   } catch (err) {
     console.error("Connection failed:", err);
     alert("Connection failed: " + err.message);
@@ -153,11 +138,6 @@ async function disconnectWallet() {
   userAddress = null;
   provider = null;
   signer = null;
-  try {
-    await auth.signOut(); // Sign out from Firebase
-  } catch (err) {
-    console.error("Firebase sign-out error:", err);
-  }
   updateWalletUI();
   const emailRegisterDiv = document.getElementById("emailRegister");
   const emailVerifyDiv = document.getElementById("emailVerify");
@@ -168,8 +148,7 @@ async function disconnectWallet() {
   if (registeredEmailEl) registeredEmailEl.textContent = "Registered Email: None";
   if (friendsDropdown) friendsDropdown.innerHTML = '<option value="">Select a friend</option>';
   localStorage.removeItem("verifiedEmail");
-  localStorage.removeItem("verifiedFirebaseEmail");
-  await displayFriends();
+  await displayFriends(); // Clear friends list on disconnect
 }
 
 function updateWalletUI() {
@@ -397,57 +376,6 @@ async function addFriend() {
   }
 }
 
-async function sendMagicLink() {
-  const email = document.getElementById("emailInput").value.trim().toLowerCase();
-  const resultDiv = document.getElementById("result");
-  if (!email || !email.includes('@')) {
-    resultDiv.innerHTML = '<p style="color:red;">Enter a valid email.</p>';
-    return;
-  }
-
-  try {
-    const actionCodeSettings = {
-      url: window.location.href, // Redirect back to send-tokens.html
-      handleCodeInApp: true
-    };
-    await auth.sendSignInLinkToEmail(email, actionCodeSettings);
-    localStorage.setItem("emailForSignIn", email);
-    resultDiv.innerHTML = `<p style="color:blue;">⏳ Magic link sent to ${email}. Please check your email.</p>`;
-  } catch (err) {
-    console.error("Send magic link error:", err);
-    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-  }
-}
-
-async function registerEmail() {
-  if (!provider || !signer) {
-    document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
-    return;
-  }
-  const email = localStorage.getItem("verifiedFirebaseEmail");
-  const resultDiv = document.getElementById("result");
-  if (!email) {
-    resultDiv.innerHTML = '<p style="color:red;">Please verify your email with the magic link first.</p>';
-    return;
-  }
-  try {
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const emailHash = ethers.utils.id(email);
-    console.log("Registering Email:", email, "Hash:", emailHash);
-    const tx = await contract.registerEmail(email);
-    resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
-    await tx.wait();
-    resultDiv.innerHTML = `<p style="color:green;">✅ Email registered successfully!</p>`;
-    localStorage.setItem("verifiedEmail", email);
-    localStorage.removeItem("verifiedFirebaseEmail");
-    localStorage.removeItem("emailForSignIn");
-    await checkEmailRegistration();
-  } catch (err) {
-    console.error("Register email error:", err);
-    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
-  }
-}
-
 async function sendTokens() {
   if (!provider || !signer) {
     document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
@@ -501,6 +429,7 @@ async function sendTokens() {
       const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
       const amountWei = ethers.utils.parseUnits(amount, 18);
       tx = await tokenContract.transfer(recipientAddress, amountWei);
+      // Log transfer in Pay2Friends contract
       const logTx = await contract.logTransfer(recipientAddress, token, amountWei);
       resultDiv.innerHTML = `<p style="color:blue;">⏳ Transaction sent: ${tx.hash}, Logging: ${logTx.hash}</p>`;
       await tx.wait();
@@ -508,6 +437,7 @@ async function sendTokens() {
       resultDiv.innerHTML = `<p style="color:green;">✅ Sent ${amount} P2F to ${recipient}</p>`;
     }
 
+    // Save friend after successful transfer
     await saveFriend(recipient, recipientAddress);
     await displayFriends();
     await updateBalance();
@@ -521,7 +451,34 @@ async function sendTokens() {
   updatePriceConversion();
 }
 
-// Check for existing MetaMask connection and Firebase email link on page load
+async function registerEmail() {
+  if (!provider || !signer) {
+    document.getElementById("result").innerHTML = '<p style="color:red;">Please connect wallet first.</p>';
+    return;
+  }
+  const email = document.getElementById("emailInput").value.trim().toLowerCase();
+  const resultDiv = document.getElementById("result");
+  if (!email || !email.includes('@')) {
+    resultDiv.innerHTML = '<p style="color:red;">Enter a valid email.</p>';
+    return;
+  }
+  try {
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const emailHash = ethers.utils.id(email);
+    console.log("Registering Email:", email, "Hash:", emailHash);
+    const tx = await contract.registerEmail(email);
+    resultDiv.innerHTML = `<p style="color:blue;">⏳ Registering email... Tx: ${tx.hash}</p>`;
+    await tx.wait();
+    resultDiv.innerHTML = `<p style="color:green;">✅ Email registered successfully!</p>`;
+    localStorage.setItem("verifiedEmail", email);
+    await checkEmailRegistration();
+  } catch (err) {
+    console.error("Register email error:", err);
+    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+  }
+}
+
+// Check for existing MetaMask connection on page load
 async function checkExistingConnection() {
   if (typeof window.ethereum !== "undefined") {
     try {
@@ -531,25 +488,6 @@ async function checkExistingConnection() {
       }
     } catch (err) {
       console.error("Failed to check existing connection:", err);
-    }
-  }
-
-  // Handle Firebase email link
-  if (auth.isSignInWithEmailLink(window.location.href)) {
-    const email = localStorage.getItem("emailForSignIn");
-    if (!email) {
-      document.getElementById("result").innerHTML = '<p style="color:red;">Error: No email found for verification.</p>';
-      return;
-    }
-    try {
-      await auth.signInWithEmailLink(email, window.location.href);
-      localStorage.setItem("verifiedFirebaseEmail", email);
-      document.getElementById("result").innerHTML = `<p style="color:green;">✅ Email ${email} verified. Now register it with the blockchain.</p>`;
-      localStorage.removeItem("emailForSignIn");
-      await checkEmailRegistration();
-    } catch (err) {
-      console.error("Firebase email link error:", err);
-      document.getElementById("result").innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
     }
   }
 }
@@ -567,7 +505,7 @@ async function handleConnectClick() {
 window.addEventListener("load", () => {
   const connectBtn = document.getElementById("connectBtn");
   const connectWalletBtn = document.getElementById("connectWallet");
-  const sendMagicLinkBtn = document.getElementById("sendMagicLinkBtn");
+  const registerEmailBtn = document.getElementById("registerEmailBtn");
   const verifyEmailBtn = document.getElementById("verifyEmailBtn");
   const sendBtn = document.getElementById("sendBtn");
   const addFriendBtn = document.getElementById("addFriendBtn");
@@ -580,8 +518,8 @@ window.addEventListener("load", () => {
   if (connectWalletBtn) {
     connectWalletBtn.addEventListener("click", handleConnectClick);
   }
-  if (sendMagicLinkBtn) {
-    sendMagicLinkBtn.addEventListener("click", sendMagicLink);
+  if (registerEmailBtn) {
+    registerEmailBtn.addEventListener("click", registerEmail);
   }
   if (verifyEmailBtn) {
     verifyEmailBtn.addEventListener("click", verifyEmail);
